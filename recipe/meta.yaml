@@ -6,7 +6,7 @@
 {% set oneccl_build_number = "343" %}
 
 # use this if our build script changes and we need to increment beyond intel's version
-{% set dst_build_number = '0' %}
+{% set dst_build_number = '1' %}
 
 package:
   name: intel-compiler-repack
@@ -198,14 +198,15 @@ outputs:
       skip: True  # [not (linux64 or win64)]
       missing_dso_whitelist:
         - '*'
+      run_exports:
+        # 1. strong so if gets added if this package is in the build requirement section.
+        # 2. Pin to year for now, similar to MKL.
+        strong:
+          - {{ pin_subpackage("dpcpp-cpp-rt", max_pin="x") }}
     requirements:
       run:
         - {{ pin_subpackage('dpcpp-cpp-rt', exact=True) }}
-    run_exports:
-      # 1. strong so if gets added if this package is in the build requirement section.
-      # 2. Pin to year for now, similar to MKL.
-      strong:
-        - {{ pin_subpackage("dpcpp-cpp-rt", max_pin="x") }}
+
     about:
       home: https://software.intel.com/content/www/us/en/develop/tools.html
       doc_url: https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html
@@ -234,15 +235,15 @@ outputs:
       skip: True  # [not (linux64 or win64)]
       missing_dso_whitelist:
         - '*'
+      run_exports:
+        # 1. strong so if gets added if this package is in the build requirement section.
+        # 2. Pin to year for now, similar to MKL.
+        strong:
+          - {{ pin_subpackage("dpcpp-cpp-rt", max_pin="x") }}
     requirements:   # [linux64 or win64]
       run:          # [linux64 or win64]
         - {{ pin_subpackage('dpcpp_impl_linux-64', exact=True) }} # [linux64]
         - {{ pin_subpackage('dpcpp_impl_win-64', exact=True) }}   # [win64]
-    run_exports:
-      # 1. strong so if gets added if this package is in the build requirement section.
-      # 2. Pin to year for now, similar to MKL.
-      strong:
-        - {{ pin_subpackage("dpcpp-cpp-rt", max_pin="x") }}
     about:
       home: https://software.intel.com/content/www/us/en/develop/tools.html
       doc_url: https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html
