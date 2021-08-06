@@ -43,8 +43,6 @@ source:
 
 build:
   number: {{ intel_build_number|int + dst_build_number|int }}
-  binary_relocation: false
-  detect_binary_files_with_prefix: false
   skip: True                                  # [not (linux64 or win or osx)]
   missing_dso_whitelist:
     # these are binary repackages after all.
@@ -248,7 +246,7 @@ outputs:
       home: https://software.intel.com/content/www/us/en/develop/tools.html
       doc_url: https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html
       dev_url: https://software.intel.com/content/www/us/en/develop/documentation/oneapi-dpcpp-cpp-compiler-dev-guide-and-reference/top.html
-      summary: Implementation for Intel® oneAPI DPC++/C++ Compiler
+      summary: Activation for Intel® oneAPI DPC++/C++ Compiler
       license: Intel End User License Agreement for Developer Tools
       license_family: Proprietary
       license_file:                                                   # [linux64 or win64]
@@ -268,7 +266,6 @@ outputs:
   - name: oneccl-devel
     script: repack.sh   # [unix]
     build:
-      number: {{ oneccl_build_number|int + dst_build_number|int }}
       skip: True  # [not linux64]
       missing_dso_whitelist:
         - '*'
