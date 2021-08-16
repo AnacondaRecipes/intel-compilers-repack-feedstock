@@ -35,6 +35,8 @@ source:
     folder: dpcpp_impl_{{ target_platform }}
   - url: https://anaconda.org/intel/dpcpp_{{ target_platform }}/{{ version }}/download/{{ target_platform }}/dpcpp_{{ target_platform }}-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
     folder: dpcpp_{{ target_platform }}
+    patches:
+      - patches/0001-dpcpp-activation.patch
   {% endif %}
   {% if linux64 %}
   - url: https://anaconda.org/intel/oneccl-devel/{{ version }}/download/{{ target_platform }}/oneccl-devel-{{ version }}-intel_{{ oneccl_build_number }}.tar.bz2
@@ -49,6 +51,11 @@ build:
     # Note: any output that specifies a 'build' section will need to include this
     # because it gets overwritten? what about binary_relocation / detect_binary_files_with_prefix?
     - '*'
+
+requirements:
+  build:
+    - patch     # [unix]
+    - m2-patch  # [win]
 
 outputs:
   - name: intel-cmplr-lic-rt
@@ -201,10 +208,17 @@ outputs:
         # 2. Pin to year for now, similar to MKL.
         strong:
           - {{ pin_subpackage("dpcpp-cpp-rt", max_pin="x") }}
+          - libgcc-ng >={{ c_compiler_version }}
+          - libstdcxx-ng >={{ cxx_compiler_version }}
     requirements:
       run:
         - {{ pin_subpackage('dpcpp-cpp-rt', exact=True) }}
-
+        # compiler's need a sysroot "/"
+        - sysroot_{{ target_platform }}   # [linux]
+        # targets --rtlib=libgcc because compiler-rt builtins is not provided.
+        - gcc_impl_{{ target_platform }}  # [linux]
+        # these binaries target -stdlib=libstdc++
+        - gxx_impl_{{ target_platform }}  # [linux]
     about:
       home: https://software.intel.com/content/www/us/en/develop/tools.html
       doc_url: https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html
@@ -220,25 +234,31 @@ outputs:
         This package is a repackaged set of binaries obtained directly from Intel's Anaconda.org channel.
     test:
       commands:
-        - ls -A1 ${PREFIX}/bin/*         # [unix]
-        - ls -A1 ${PREFIX}/include/*     # [unix]
-        - ls -A1 ${PREFIX}/lib/*         # [unix]
+        - ls -A1 ${PREFIX}/bin/*         # [linux]
+        - ls -A1 ${PREFIX}/include/*     # [linux]
+        - ls -A1 ${PREFIX}/lib/*         # [linux]
         - dir %PREFIX%\Library\bin\*  # [win]
         - dir %PREFIX%\Library\lib\*  # [win]
 
   - name: dpcpp_{{ target_platform }}
-    script: repack.sh   # [unix]
-    script: repack.bat  # [win]
+    script: update-activate-and-repack.sh   # [unix]
+    script: repack.bat                      # [win]
     build:
       skip: True  # [not (linux64 or win64)]
       missing_dso_whitelist:
         - '*'
+      # these are duplicated from the dpcpp_impl* in order to ensure they are followed.
       run_exports:
         # 1. strong so if gets added if this package is in the build requirement section.
         # 2. Pin to year for now, similar to MKL.
         strong:
           - {{ pin_subpackage("dpcpp-cpp-rt", max_pin="x") }}
+          - libgcc-ng >={{ c_compiler_version }}
+          - libstdcxx-ng >={{ cxx_compiler_version }}
     requirements:   # [linux64 or win64]
+      # for us to be able to use clang/icx -dumpmachine
+      build:          # [linux64 or win64]
+        - dpcpp_impl_{{ target_platform }}  # [linux64 or win64]
       run:          # [linux64 or win64]
         - {{ pin_subpackage('dpcpp_impl_linux-64', exact=True) }} # [linux64]
         - {{ pin_subpackage('dpcpp_impl_win-64', exact=True) }}   # [win64]
@@ -257,9 +277,9 @@ outputs:
         This package is a repackaged set of binaries obtained directly from Intel's Anaconda.org channel.
     test:
       commands:
-        - ls -A1 ${PREFIX}/bin/*         # [unix]
-        - ls -A1 ${PREFIX}/include/*     # [unix]
-        - ls -A1 ${PREFIX}/lib/*         # [unix]
+        - ls -A1 ${PREFIX}/bin/*         # [linux]
+        - ls -A1 ${PREFIX}/include/*     # [linux]
+        - ls -A1 ${PREFIX}/lib/*         # [linux]
         - dir %PREFIX%\Library\bin\*  # [win]
         - dir %PREFIX%\Library\lib\*  # [win]
 
