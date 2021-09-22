@@ -45,7 +45,8 @@ source:
 
 build:
   number: {{ intel_build_number|int + dst_build_number|int }}
-  skip: True                                  # [not (linux64 or win or osx)]
+  # skip if target is not x86_64, which is only supported on linux, osx, and win.
+  skip: True                                  # [not x86_64 or not (linux or osx or win)]
   missing_dso_whitelist:
     # these are binary repackages after all.
     # Note: any output that specifies a 'build' section will need to include this
