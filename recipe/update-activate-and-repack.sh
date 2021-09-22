@@ -7,14 +7,14 @@ src="${SRC_DIR}/${PKG_NAME}"
 CBUILD=$(${PREFIX}/bin/icx -dumpmachine | sed "s/unknown/conda/")
 CHOST=$(${PREFIX}/bin/icx -dumpmachine | sed "s/unknown/conda/")
 
-FINAL_CFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe"
-FINAL_DEBUG_CFLAGS="-march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-all -fno-plt -Og -g -Wall -Wextra -fvar-tracking-assignments -ffunction-sections -pipe"
-FINAL_CPPFLAGS="-DNDEBUG -D_FORTIFY_SOURCE=2 -O2 -fuse-ld=lld"
-FINAL_DEBUG_CPPFLAGS="-D_DEBUG -D_FORTIFY_SOURCE=2 -Og -fuse-ld=lld"
-FINAL_CXXFLAGS="-fvisibility-inlines-hidden -std=c++17 -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-strong -fno-plt -O2 -ffunction-sections -pipe"
-FINAL_DEBUG_CXXFLAGS="-fvisibility-inlines-hidden -std=c++17 -fmessage-length=0 -march=nocona -mtune=haswell -ftree-vectorize -fPIC -fstack-protector-all -fno-plt -Og -g -Wall -Wextra -fvar-tracking-assignments -ffunction-sections -pipe"
-FINAL_LDFLAGS="-Wl,-O2 -Wl,--sort-common -Wl,--as-needed -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -fuse-ld=lld"
-FINAL_LDFLAGS_LD="-O2 --sort-common --as-needed -z relro -z now --disable-new-dtags --gc-sections -fuse-ld=lld"
+FINAL_CFLAGS="-Wformat -Wformat-security -O3 -fp-model strict -fomit-frame-pointer -xSSE4.2 -axCORE-AVX2,COMMON-AVX512 -fPIC -fstack-protector-all -fno-plt -ftree-vectorize -ffunction-sections -pipe"
+FINAL_DEBUG_CFLAGS="-Wformat -Wformat-security -O0g -g -fp-model strict -fomit-frame-pointer -xSSE4.2 -axCORE-AVX2,COMMON-AVX512 -fPIC -fstack-protector-all -fno-plt -ftree-vectorize -ffunction-sections -pipe"
+FINAL_CPPFLAGS="-DNDEBUG -D_FORTIFY_SOURCE=2"
+FINAL_DEBUG_CPPFLAGS="-D_DEBUG -D_FORTIFY_SOURCE=2 -Og"
+FINAL_CXXFLAGS="-std=c++17 -Wformat -Wformat-security -O3 -fp-model strict -fomit-frame-pointer -xSSE4.2 -axCORE-AVX2,COMMON-AVX512 -fPIC -fstack-protector-all"
+FINAL_DEBUG_CXXFLAGS="-std=c++17 -Wformat -Wformat-security -O0g -g -fp-model strict -fomit-frame-pointer -xSSE4.2 -axCORE-AVX2,COMMON-AVX512 -fPIC -fstack-protector-all"
+FINAL_LDFLAGS="-Wl,-O3 -Wl,--sort-common -Wl,--as-needed -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -Wl,--disable-new-dtags -Wl,--gc-sections -fuse-ld=lld"
+FINAL_LDFLAGS_LD="-O0g -g --sort-common --as-needed -z noexecstack -z relro -z now --disable-new-dtags --gc-sections -fuse-ld=lld"
 
 # if [[ "$target_platform" == "$ctng_target_platform" ]]; then
 #   export CONDA_BUILD_CROSS_COMPILATION=""
