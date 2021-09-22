@@ -1,2 +1,4 @@
-CHOST:
-  - x86_64-conda-linux-gnu  # [linux64]
+CHOST:                                              # [linux64]
+  - x86_64-conda-linux-gnu                          # [linux64]
+FINAL_PYTHON_SYSCONFIGDATA_NAME:                    # [linux64]
+  - _sysconfigdata_x86_64_conda_linux_gnu           # [linux64]

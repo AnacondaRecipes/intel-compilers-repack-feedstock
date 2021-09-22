@@ -1,5 +1,5 @@
 diff --git a/etc/conda/activate.d/activate-dpcpp.sh b/etc/conda/activate.d/activate-dpcpp.sh
-index c21165a..98908fb 100755
+index c21165a..cbbc756 100755
 --- a/etc/conda/activate.d/activate-dpcpp.sh
 +++ b/etc/conda/activate.d/activate-dpcpp.sh
 @@ -83,12 +83,40 @@ function _tc_activation() {
@@ -43,7 +43,7 @@ index c21165a..98908fb 100755
    CPATH_USED="${CONDA_PREFIX}/include:${CONDA_PREFIX}"
    LIBRARY_PATH_USED="${CONDA_PREFIX}/compiler/lib:${LIBRARY_PATH}"
    LD_LIBRARY_PATH_USED="${CONDA_PREFIX}/compiler/lib/intel64_lin:${CONDA_PREFIX}/compiler/lib:${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}"
-@@ -103,10 +131,29 @@ fi
+@@ -103,10 +131,30 @@ fi
  
  _tc_activation \
    activate @CHOST@- "HOST,@CHOST@" "BUILD,@CBUILD@" \
@@ -61,6 +61,7 @@ index c21165a..98908fb 100755
 +  "LDFLAGS,${LDFLAGS:-${LDFLAGS_USED}}" \
 +  "LDFLAGS_LD,${LDFLAGS_LD:-${LDFLAGS_LD_USED}}" \
 +  "CONDA_BUILD_SYSROOT,${CONDA_BUILD_SYSROOT_USED:-}" \
++  "_CONDA_PYTHON_SYSCONFIGDATA_NAME,${_CONDA_PYTHON_SYSCONFIGDATA_NAME:-@_PYTHON_SYSCONFIGDATA_NAME@}" \
 +  "CMAKE_ARGS,${_CMAKE_ARGS:-}" \
 +  "CONDA_BUILD_CROSS_COMPILATION,@CONDA_BUILD_CROSS_COMPILATION@" \
 +  "CMAKE_PREFIX_PATH,${CMAKE_PREFIX_PATH_USED}" \
@@ -74,7 +75,7 @@ index c21165a..98908fb 100755
    echo "ERROR: $(_get_sourced_filename) failed, see above for details"
  else
 diff --git a/etc/conda/deactivate.d/deactivate-dpcpp.sh b/etc/conda/deactivate.d/deactivate-dpcpp.sh
-index 6975b03..bd1b858 100755
+index 6975b03..a4ff33f 100755
 --- a/etc/conda/deactivate.d/deactivate-dpcpp.sh
 +++ b/etc/conda/deactivate.d/deactivate-dpcpp.sh
 @@ -83,11 +83,32 @@ function _tc_activation() {
@@ -110,7 +111,7 @@ index 6975b03..bd1b858 100755
    CPATH_USED="${CONDA_PREFIX}/include:${CONDA_PREFIX}"
    LIBRARY_PATH_USED="${CONDA_PREFIX}/compiler/lib:${LIBRARY_PATH}"
    LD_LIBRARY_PATH_USED="${CONDA_PREFIX}/compiler/lib/intel64_lin:${CONDA_PREFIX}/compiler/lib:${CONDA_PREFIX}/lib:${LD_LIBRARY_PATH}"
-@@ -102,6 +123,23 @@ fi
+@@ -102,6 +123,24 @@ fi
  
  _tc_activation \
    deactivate @CHOST@- "HOST,@CHOST@" "BUILD,@CBUILD@" \
@@ -128,6 +129,7 @@ index 6975b03..bd1b858 100755
 +  "LDFLAGS,${LDFLAGS:-${LDFLAGS_USED}}" \
 +  "LDFLAGS_LD,${LDFLAGS_LD:-${LDFLAGS_LD_USED}}" \
 +  "CONDA_BUILD_SYSROOT,${CONDA_BUILD_SYSROOT_USED:-}" \
++  "_CONDA_PYTHON_SYSCONFIGDATA_NAME,${_CONDA_PYTHON_SYSCONFIGDATA_NAME:-@_PYTHON_SYSCONFIGDATA_NAME@}" \
 +  "CMAKE_ARGS,${_CMAKE_ARGS:-}" \
 +  "CONDA_BUILD_CROSS_COMPILATION,@CONDA_BUILD_CROSS_COMPILATION@" \
 +  "CMAKE_PREFIX_PATH,${CMAKE_PREFIX_PATH_USED}" \
