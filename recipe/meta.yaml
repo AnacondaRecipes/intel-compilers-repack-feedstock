@@ -1,12 +1,12 @@
-{% set version = "2021.3.0" %}
-{% set intel_build_number = "3350" %}  # [linux]
-{% set intel_build_number = "3375" %}  # [osx]
-{% set intel_build_number = "3372" %}  # [win]
+{% set version = "2021.4.0" %}
+{% set intel_build_number = "3561" %}  # [linux]
+{% set intel_build_number = "3538" %}  # [osx]
+{% set intel_build_number = "3556" %}  # [win]
 
-{% set oneccl_build_number = "343" %}
+{% set oneccl_build_number = "433" %}
 
 # use this if our build script changes and we need to increment beyond intel's version
-{% set dst_build_number = '1' %}
+{% set dst_build_number = '0' %}
 
 package:
   name: intel-compiler-repack
@@ -45,7 +45,7 @@ build:
   number: {{ intel_build_number|int + dst_build_number|int }}
   binary_relocation: false
   detect_binary_files_with_prefix: false
-  skip: True                                  # [not (linux64 or win or osx)]
+  skip: True                                  # [not (x86 and (linux or win or osx))]
   missing_dso_whitelist:
     # these are binary repackages after all.
     # Note: any output that specifies a 'build' section will need to include this
