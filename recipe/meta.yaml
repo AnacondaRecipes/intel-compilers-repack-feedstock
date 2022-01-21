@@ -1,9 +1,13 @@
-{% set version = "2021.4.0" %}
-{% set intel_build_number = "3561" %}  # [linux]
-{% set intel_build_number = "3538" %}  # [osx]
-{% set intel_build_number = "3556" %}  # [win]
+{% set version = "2022.0.1" %}          # [linux]
+{% set version = "2022.0.0" %}          # [osx or win]
+{% set intel_build_number = "3633" %}   # [linux]
+{% set intel_build_number = "3615" %}   # [osx]
+{% set intel_build_number = "3663" %}   # [win]
 
-{% set oneccl_build_number = "433" %}
+{% set oneccl_version = "2021.5.0" %}
+{% set oneccl_build_number = "478" %}
+
+{% set tbb_version = "2021.5.0" %}
 
 # use this if our build script changes and we need to increment beyond intel's version
 {% set dst_build_number = '0' %}
@@ -31,15 +35,13 @@ source:
     folder: intel-opencl-rt
   {% endif %}
   {% if linux64 or win64 %}
-  - url: https://anaconda.org/intel/dpl-include/{{ version }}/download/{{ target_platform }}/dpl-include-{{ version }}-intel_0.tar.bz2
-    folder: dpl-include
   - url: https://anaconda.org/intel/dpcpp_impl_{{ target_platform }}/{{ version }}/download/{{ target_platform }}/dpcpp_impl_{{ target_platform }}-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
     folder: dpcpp_impl_{{ target_platform }}
   - url: https://anaconda.org/intel/dpcpp_{{ target_platform }}/{{ version }}/download/{{ target_platform }}/dpcpp_{{ target_platform }}-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
     folder: dpcpp_{{ target_platform }}
   {% endif %}
   {% if linux64 %}
-  - url: https://anaconda.org/intel/oneccl-devel/{{ version }}/download/{{ target_platform }}/oneccl-devel-{{ version }}-intel_{{ oneccl_build_number }}.tar.bz2
+  - url: https://anaconda.org/intel/oneccl-devel/{{ oneccl_version }}/download/{{ target_platform }}/oneccl-devel-{{ oneccl_version }}-intel_{{ oneccl_build_number }}.tar.bz2
     folder: oneccl-devel
   {% endif %}
 
@@ -111,7 +113,7 @@ outputs:
     requirements:
       run:
         - intel-openmp {{ version.split('.')[0] }}.*
-        - tbb {{ version.split('.')[0] }}.*
+        - tbb {{ tbb_version.split('.')[0] }}.*
         - {{ pin_subpackage('intel-cmplr-lic-rt', exact=True) }}
     about:
       home: https://software.intel.com/content/www/us/en/develop/tools.html
@@ -207,7 +209,6 @@ outputs:
           - {{ pin_subpackage("dpcpp-cpp-rt", max_pin="x") }}
     requirements:
       run:
-        - dpl-include
         - {{ pin_subpackage('dpcpp-cpp-rt', exact=True) }}
 
     about:
@@ -269,6 +270,7 @@ outputs:
         - dir %PREFIX%\Library\lib\*  # [win]
 
   - name: oneccl-devel
+    version: {{ oneccl_version }}
     script: repack.sh   # [unix]
     build:
       number: {{ oneccl_build_number|int + dst_build_number|int }}
@@ -291,31 +293,6 @@ outputs:
     test:
       commands:
         - ls -A1 $PREFIX/lib/*  # [unix]
-
-  - name: dpl-include
-    script: repack.sh   # [unix]
-    script: repack.bat  # [win]
-    build:
-      skip: True  # [not (linux64 or win64)]
-      missing_dso_whitelist:
-        - '*'
-    about:
-      home: https://software.intel.com/content/www/us/en/develop/tools.html
-      doc_url: https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html
-      dev_url: https://software.intel.com/content/www/us/en/develop/documentation/oneapi-dpcpp-cpp-compiler-dev-guide-and-reference/top.html
-      summary: Intel® DPC++ Compilers (dpl component)
-      license: Intel End User License Agreement for Developer Tools
-      license_family: Proprietary
-      license_file:
-        - dpcpp_impl_{{ target_platform }}/info/licenses/license.txt  # [linux64 or win64]
-        - dpcpp_impl_{{ target_platform }}/info/licenses/tpp.txt      # [linux64 or win64]
-      description: |
-        Additional header files for Intel® oneAPI DPC++/C++ Compiler.
-        This package is a repackaged set of binaries obtained directly from Intel's Anaconda.org channel.
-    test:
-      commands:
-        - ls -A1 ${PREFIX}/include/oneapi/*     # [unix]
-        - dir %PREFIX%\Library\include\oneapi\*  # [win]
 
 about:
   home: https://github.com/AnacondaRecipes/intel-compilers-repack-feedstock
