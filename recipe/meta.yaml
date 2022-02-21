@@ -5,6 +5,9 @@
 
 {% set oneccl_build_number = "343" %}
 
+{% set mkl_dpcpp_build_number = "520" %}  # [linux]
+{% set mkl_dpcpp_build_number = "524" %}  # [win]
+
 # use this if our build script changes and we need to increment beyond intel's version
 {% set dst_build_number = '1' %}
 
@@ -35,6 +38,10 @@ source:
     folder: dpcpp_impl_{{ target_platform }}
   - url: https://anaconda.org/intel/dpcpp_{{ target_platform }}/{{ version }}/download/{{ target_platform }}/dpcpp_{{ target_platform }}-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
     folder: dpcpp_{{ target_platform }}
+  - url: https://anaconda.org/intel/mkl-dpcpp/{{ version }}/download/{{ target_platform }}/mkl-dpcpp-{{ version }}-intel_{{ mkl_dpcpp_build_number }}.tar.bz2
+    folder: mkl-dpcpp
+  - url: https://anaconda.org/intel/mkl-devel-dpcpp/{{ version }}/download/{{ target_platform }}/mkl-devel-dpcpp-{{ version }}-intel_{{ mkl_dpcpp_build_number }}.tar.bz2
+    folder: mkl-devel-dpcpp
   {% endif %}
   {% if linux64 %}
   - url: https://anaconda.org/intel/oneccl-devel/{{ version }}/download/{{ target_platform }}/oneccl-devel-{{ version }}-intel_{{ oneccl_build_number }}.tar.bz2
@@ -288,6 +295,83 @@ outputs:
     test:
       commands:
         - ls -A1 $PREFIX/lib/*  # [unix]
+
+  - name: mkl-dpcpp
+    script: repack.sh   # [linux64]
+    script: repack.bat  # [win64]
+    build:
+      number: {{ mkl_dpcpp_build_number|int + dst_build_number|int }}   # [linux64 or win64]
+      skip: True  # [not (linux64 or win64)]
+      missing_dso_whitelist:
+        - '*'
+    requirements:
+      run:
+        - mkl =={{ version }}
+        - dpcpp-cpp-rt {{ version.split('.')[0] }}.*
+        - intel-opencl-rt {{ version.split('.')[0] }}.*
+    about:
+      home: https://www.intel.com/content/www/us/en/develop/tools.html
+      doc_url: https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html
+      dev_url: https://www.intel.com/content/www/us/en/develop/documentation/oneapi-mkl-dpcpp-developer-reference/top.html
+      summary: Intel® oneAPI Math Kernel Library
+      license: Intel Simplified Software License
+      license_family: Proprietary
+      license_file:
+        - mkl-dpcpp/info/licenses/license.txt
+        - mkl-dpcpp/info/licenses/tpp.txt
+      description: |
+        <strong>LEGAL NOTICE: Use of this software package is subject to the
+        software license agreement (as set forth above, in the license section
+        of the installed Conda package and/or the README file) and all notices,
+        disclaimers or license terms for third party or open source software
+        included in or with the software.</strong>
+        <br/><br/>
+        EULA: <a href=\"https://software.intel.com/content/dam/develop/external/us/en/documents/pdf/intel-simplified-software-license.pdf\" target=\"_blank\">Intel Simplified Software License</a>
+        <br/> Third Party Programs: Included in software package <br/><br/>
+    test:
+      commands:
+        - ls -A1 ${PREFIX}/lib/*        # [linux64]
+        - dir %PREFIX%\Library\lib\*    # [win64]
+
+  - name: mkl-devel-dpcpp
+    script: repack.sh   # [linux64]
+    script: repack.bat  # [win64]
+    build:
+      number: {{ mkl_dpcpp_build_number|int + dst_build_number|int }}   # [linux64 or win64]
+      skip: True  # [not (linux64 or win64)]
+      missing_dso_whitelist:
+        - '*'
+      run_exports:
+        - {{ pin_subpackage('mkl-dpcpp') }}
+    requirements:
+      run:
+        - mkl-devel =={{ version }}
+        - {{ pin_subpackage('mkl-dpcpp', exact=True) }}
+    about:
+      home: https://www.intel.com/content/www/us/en/develop/tools.html
+      doc_url: https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html
+      dev_url: https://www.intel.com/content/www/us/en/develop/documentation/oneapi-mkl-dpcpp-developer-reference/top.html
+      summary: Intel® oneAPI Math Kernel Library
+      license: Intel Simplified Software License
+      license_family: Proprietary
+      license_file:
+        - mkl-devel-dpcpp/info/licenses/license.txt
+        - mkl-devel-dpcpp/info/licenses/tpp.txt
+      description: |
+        <strong>LEGAL NOTICE: Use of this software package is subject to the
+        software license agreement (as set forth above, in the license section
+        of the installed Conda package and/or the README file) and all notices,
+        disclaimers or license terms for third party or open source software
+        included in or with the software.</strong>
+        <br/><br/>
+        EULA: <a href=\"https://software.intel.com/content/dam/develop/external/us/en/documents/pdf/intel-simplified-software-license.pdf\" target=\"_blank\">Intel Simplified Software License</a>
+        <br/> Third Party Programs: Included in software package <br/><br/>
+    test:
+      commands:
+        - ls -A1 ${PREFIX}/lib/*            # [linux64]
+        - ls -A1 ${PREFIX}/include/*        # [linux64]
+        - dir %PREFIX%\Library\include\*    # [win64]
+        - dir %PREFIX%\Library\lib\*        # [win64]
 
 about:
   home: https://github.com/AnacondaRecipes/intel-compilers-repack-feedstock
