@@ -1,16 +1,16 @@
-{% set version = "2022.0.1" %}          # [linux]
-{% set version = "2022.0.0" %}          # [osx or win]
-{% set intel_build_number = "3633" %}   # [linux]
-{% set intel_build_number = "3615" %}   # [osx]
-{% set intel_build_number = "3663" %}   # [win]
+{% set version = "2022.1.0" %}          # [linux]
+{% set version = "2022.1.0" %}          # [osx or win]
+{% set intel_build_number = "3768" %}   # [linux]
+{% set intel_build_number = "3718" %}   # [osx]
+{% set intel_build_number = "3787" %}   # [win]
 
 {% set oneccl_version = "2021.5.0" %}
 {% set oneccl_build_number = "478" %}
 
-{% set tbb_version = "2021.5.0" %}
+{% set tbb_version = "2021.6.0" %}
 
-{% set mkl_dpcpp_build_number = "117" %}  # [linux]
-{% set mkl_dpcpp_build_number = "115" %}  # [win]
+{% set mkl_dpcpp_build_number = "223" %}  # [linux]
+{% set mkl_dpcpp_build_number = "192" %}  # [win]
 
 # use this if our build script changes and we need to increment beyond intel's version
 {% set dst_build_number = '0' %}
@@ -37,7 +37,7 @@ source:
   - url: https://anaconda.org/intel/intel-opencl-rt/{{ version }}/download/{{ target_platform }}/intel-opencl-rt-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
     folder: intel-opencl-rt
   {% endif %}
-  {% if linux64 or win64 %}
+  {% if linux or win64 %}
   - url: https://anaconda.org/intel/dpcpp_impl_{{ target_platform }}/{{ version }}/download/{{ target_platform }}/dpcpp_impl_{{ target_platform }}-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
     folder: dpcpp_impl_{{ target_platform }}
   - url: https://anaconda.org/intel/dpcpp_{{ target_platform }}/{{ version }}/download/{{ target_platform }}/dpcpp_{{ target_platform }}-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
@@ -47,7 +47,7 @@ source:
   - url: https://anaconda.org/intel/mkl-devel-dpcpp/{{ version }}/download/{{ target_platform }}/mkl-devel-dpcpp-{{ version }}-intel_{{ mkl_dpcpp_build_number }}.tar.bz2
     folder: mkl-devel-dpcpp
   {% endif %}
-  {% if linux64 %}
+  {% if linux %}
   - url: https://anaconda.org/intel/oneccl-devel/{{ oneccl_version }}/download/{{ target_platform }}/oneccl-devel-{{ oneccl_version }}-intel_{{ oneccl_build_number }}.tar.bz2
     folder: oneccl-devel
   {% endif %}
@@ -206,7 +206,7 @@ outputs:
     script: repack.sh   # [unix]
     script: repack.bat  # [win]
     build:
-      skip: True  # [not (linux64 or win64)]
+      skip: True  # [not (linux or win64)]
       missing_dso_whitelist:
         - '*'
       run_exports:
@@ -226,8 +226,8 @@ outputs:
       license: Intel End User License Agreement for Developer Tools
       license_family: Proprietary
       license_file: 
-        - dpcpp_impl_{{ target_platform }}/info/licenses/license.txt  # [linux64 or win64]
-        - dpcpp_impl_{{ target_platform }}/info/licenses/tpp.txt      # [linux64 or win64]
+        - dpcpp_impl_{{ target_platform }}/info/licenses/license.txt  # [linux or win64]
+        - dpcpp_impl_{{ target_platform }}/info/licenses/tpp.txt      # [linux or win64]
       description: |
         Implementation for Intel® oneAPI DPC++/C++ Compiler.
         This package is a repackaged set of binaries obtained directly from Intel's Anaconda.org channel.
@@ -243,7 +243,7 @@ outputs:
     script: repack.sh   # [unix]
     script: repack.bat  # [win]
     build:
-      skip: True  # [not (linux64 or win64)]
+      skip: True  # [not (linux or win64)]
       missing_dso_whitelist:
         - '*'
       run_exports:
@@ -251,9 +251,9 @@ outputs:
         # 2. Pin to year for now, similar to MKL.
         strong:
           - {{ pin_subpackage("dpcpp-cpp-rt", max_pin="x") }}
-    requirements:   # [linux64 or win64]
-      run:          # [linux64 or win64]
-        - {{ pin_subpackage('dpcpp_impl_linux-64', exact=True) }} # [linux64]
+    requirements:   # [linux or win64]
+      run:          # [linux or win64]
+        - {{ pin_subpackage('dpcpp_impl_linux-64', exact=True) }} # [linux]
         - {{ pin_subpackage('dpcpp_impl_win-64', exact=True) }}   # [win64]
     about:
       home: https://software.intel.com/content/www/us/en/develop/tools.html
@@ -262,26 +262,34 @@ outputs:
       summary: Implementation for Intel® oneAPI DPC++/C++ Compiler
       license: Intel End User License Agreement for Developer Tools
       license_family: Proprietary
-      license_file:                                                   # [linux64 or win64]
-        - dpcpp_impl_{{ target_platform }}/info/licenses/license.txt  # [linux64 or win64]
-        - dpcpp_impl_{{ target_platform }}/info/licenses/tpp.txt      # [linux64 or win64]
+      license_file:                                                   # [linux or win64]
+        - dpcpp_impl_{{ target_platform }}/info/licenses/license.txt  # [linux or win64]
+        - dpcpp_impl_{{ target_platform }}/info/licenses/tpp.txt      # [linux or win64]
       description: |
         Activation for Intel® oneAPI DPC++/C++ Compiler.
         This package is a repackaged set of binaries obtained directly from Intel's Anaconda.org channel.
     test:
+      requires:
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
+      files:
+        - simple.cpp
       commands:
         - ls -A1 ${PREFIX}/bin/*         # [unix]
         - ls -A1 ${PREFIX}/include/*     # [unix]
         - ls -A1 ${PREFIX}/lib/*         # [unix]
         - dir %PREFIX%\Library\bin\*  # [win]
         - dir %PREFIX%\Library\lib\*  # [win]
+        - dpcpp --gcc-toolchain=$PREFIX --sysroot=$PREFIX/$HOST/sysroot -target $HOST ${LDFLAGS} ${CXXFLAGS} simple.cpp -lpthread -o simple.exe  # [unix]
+        # Need for -I option is a bug in compiler activation script. Can be removed when fixed
+        - dpcpp simple.cpp -I%PREFIX%\include -o simple.exe  # [win]
 
   - name: oneccl-devel
     version: {{ oneccl_version }}
     script: repack.sh   # [unix]
     build:
       number: {{ oneccl_build_number|int + dst_build_number|int }}
-      skip: True  # [not linux64]
+      skip: True  # [not linux]
       missing_dso_whitelist:
         - '*'
     about:
@@ -302,11 +310,11 @@ outputs:
         - ls -A1 $PREFIX/lib/*  # [unix]
 
   - name: mkl-dpcpp
-    script: repack.sh   # [linux64]
+    script: repack.sh   # [linux]
     script: repack.bat  # [win64]
     build:
-      number: {{ mkl_dpcpp_build_number|int + dst_build_number|int }}   # [linux64 or win64]
-      skip: True  # [not (linux64 or win64)]
+      number: {{ mkl_dpcpp_build_number|int + dst_build_number|int }}   # [linux or win64]
+      skip: True  # [not (linux or win64)]
       missing_dso_whitelist:
         - '*'
     requirements:
@@ -335,15 +343,15 @@ outputs:
         <br/> Third Party Programs: Included in software package <br/><br/>
     test:
       commands:
-        - ls -A1 ${PREFIX}/lib/*        # [linux64]
+        - ls -A1 ${PREFIX}/lib/*        # [linux]
         - dir %PREFIX%\Library\lib\*    # [win64]
 
   - name: mkl-devel-dpcpp
-    script: repack.sh   # [linux64]
+    script: repack.sh   # [linux]
     script: repack.bat  # [win64]
     build:
-      number: {{ mkl_dpcpp_build_number|int + dst_build_number|int }}   # [linux64 or win64]
-      skip: True  # [not (linux64 or win64)]
+      number: {{ mkl_dpcpp_build_number|int + dst_build_number|int }}   # [linux or win64]
+      skip: True  # [not (linux or win64)]
       missing_dso_whitelist:
         - '*'
       run_exports:
@@ -373,8 +381,8 @@ outputs:
         <br/> Third Party Programs: Included in software package <br/><br/>
     test:
       commands:
-        - ls -A1 ${PREFIX}/lib/*            # [linux64]
-        - ls -A1 ${PREFIX}/include/*        # [linux64]
+        - ls -A1 ${PREFIX}/lib/*            # [linux]
+        - ls -A1 ${PREFIX}/include/*        # [linux]
         - dir %PREFIX%\Library\include\*    # [win64]
         - dir %PREFIX%\Library\lib\*        # [win64]
 
@@ -385,4 +393,6 @@ about:
 
 extra:
   recipe-maintainers:
-    - 
+    - napetrov
+    - tomashek
+    - oleksandr-pavlyk
