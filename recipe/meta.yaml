@@ -42,6 +42,8 @@ source:
     folder: dpcpp_impl_{{ target_platform }}
   - url: https://anaconda.org/intel/dpcpp_{{ target_platform }}/{{ version }}/download/{{ target_platform }}/dpcpp_{{ target_platform }}-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
     folder: dpcpp_{{ target_platform }}
+    patches:
+      - patches/0001-dpcpp-activation.patch
   - url: https://anaconda.org/intel/mkl-dpcpp/{{ version }}/download/{{ target_platform }}/mkl-dpcpp-{{ version }}-intel_{{ mkl_dpcpp_build_number }}.tar.bz2
     folder: mkl-dpcpp
   - url: https://anaconda.org/intel/mkl-devel-dpcpp/{{ version }}/download/{{ target_platform }}/mkl-devel-dpcpp-{{ version }}-intel_{{ mkl_dpcpp_build_number }}.tar.bz2
@@ -62,6 +64,11 @@ build:
     # Note: any output that specifies a 'build' section will need to include this
     # because it gets overwritten? what about binary_relocation / detect_binary_files_with_prefix?
     - '*'
+
+requirements:
+  build:
+    - patch     # [unix]
+    - m2-patch  # [win]
 
 outputs:
   - name: intel-cmplr-lic-rt
@@ -213,10 +220,18 @@ outputs:
         # 1. strong so if gets added if this package is in the build requirement section.
         # 2. Pin to year for now, similar to MKL.
         strong:
-          - {{ pin_subpackage("dpcpp-cpp-rt", max_pin="x") }}
+          - {{ pin_subpackage("dpcpp-cpp-rt", max_pin="x") }}          
+          - libgcc-ng >={{ c_compiler_version }}
+          - libstdcxx-ng >={{ cxx_compiler_version }}
     requirements:
       run:
-        - {{ pin_subpackage('dpcpp-cpp-rt', exact=True) }}
+        - {{ pin_subpackage('dpcpp-cpp-rt', exact=True) }}        
+        # compiler's need a sysroot "/"
+        - sysroot_{{ target_platform }}   # [linux]
+        # targets --rtlib=libgcc because compiler-rt builtins is not provided.
+        - gcc_impl_{{ target_platform }}  # [linux]
+        # these binaries target -stdlib=libstdc++
+        - gxx_impl_{{ target_platform }}  # [linux]
 
     about:
       home: https://software.intel.com/content/www/us/en/develop/tools.html
@@ -239,9 +254,9 @@ outputs:
         - dir %PREFIX%\Library\bin\*  # [win]
         - dir %PREFIX%\Library\lib\*  # [win]
 
-  - name: dpcpp_{{ target_platform }}
-    script: repack.sh   # [unix]
-    script: repack.bat  # [win]
+  - name: dpcpp_{{ target_platform }}    
+    script: update-activate-and-repack.sh   # [unix]
+    script: repack.bat                      # [win]
     build:
       skip: True  # [not (linux or win64)]
       missing_dso_whitelist:
@@ -250,8 +265,13 @@ outputs:
         # 1. strong so if gets added if this package is in the build requirement section.
         # 2. Pin to year for now, similar to MKL.
         strong:
-          - {{ pin_subpackage("dpcpp-cpp-rt", max_pin="x") }}
+          - {{ pin_subpackage("dpcpp-cpp-rt", max_pin="x") }}          
+          - libgcc-ng >={{ c_compiler_version }}
+          - libstdcxx-ng >={{ cxx_compiler_version }}
     requirements:   # [linux or win64]
+      # for us to be able to use clang/icx -dumpmachine
+      build:        # [linux or win64]
+        - dpcpp_impl_{{ target_platform }}  # [linux or win64]
       run:          # [linux or win64]
         - {{ pin_subpackage('dpcpp_impl_linux-64', exact=True) }} # [linux]
         - {{ pin_subpackage('dpcpp_impl_win-64', exact=True) }}   # [win64]
@@ -259,7 +279,7 @@ outputs:
       home: https://software.intel.com/content/www/us/en/develop/tools.html
       doc_url: https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html
       dev_url: https://software.intel.com/content/www/us/en/develop/documentation/oneapi-dpcpp-cpp-compiler-dev-guide-and-reference/top.html
-      summary: Implementation for Intel® oneAPI DPC++/C++ Compiler
+      summary: Activation for Intel® oneAPI DPC++/C++ Compiler
       license: Intel End User License Agreement for Developer Tools
       license_family: Proprietary
       license_file:                                                   # [linux or win64]
@@ -280,7 +300,7 @@ outputs:
         - ls -A1 ${PREFIX}/lib/*         # [unix]
         - dir %PREFIX%\Library\bin\*  # [win]
         - dir %PREFIX%\Library\lib\*  # [win]
-        - dpcpp --gcc-toolchain=$PREFIX --sysroot=$PREFIX/$HOST/sysroot -target $HOST ${LDFLAGS} ${CXXFLAGS} simple.cpp -lpthread -o simple.exe  # [unix]
+        - dpcpp --gcc-toolchain=$PREFIX --sysroot=$PREFIX/$HOST/sysroot -target $HOST ${LDFLAGS} ${CXXFLAGS} simple.cpp -lpthread -o simple  # [unix]
         # Need for -I option is a bug in compiler activation script. Can be removed when fixed
         - dpcpp simple.cpp -I%PREFIX%\include -o simple.exe  # [win]
 
