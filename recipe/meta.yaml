@@ -300,7 +300,8 @@ outputs:
         - ls -A1 ${PREFIX}/lib/*         # [unix]
         - dir %PREFIX%\Library\bin\*  # [win]
         - dir %PREFIX%\Library\lib\*  # [win]
-        - dpcpp --gcc-toolchain=$PREFIX --sysroot=$PREFIX/$HOST/sysroot -target $HOST ${LDFLAGS} ${CXXFLAGS} simple.cpp -lpthread -o simple  # [unix]
+        - icpx --dpcpp -fsycl --gcc-toolchain=$PREFIX --sysroot=$PREFIX/$HOST/sysroot -target $HOST ${LDFLAGS} ${CXXFLAGS} simple.cpp -lpthread -o simple  # [unix]
+        - ./simple # [unix]
         # Need for -I option is a bug in compiler activation script. Can be removed when fixed
         - dpcpp simple.cpp -I%PREFIX%\include -o simple.exe  # [win]
 

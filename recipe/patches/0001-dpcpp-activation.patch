@@ -18,12 +18,12 @@ index c21165a..cbbc756 100755
 +  _CMAKE_ARGS="${_CMAKE_ARGS} -DCMAKE_FIND_ROOT_PATH=${PREFIX};${BUILD_PREFIX}/@CHOST@/sysroot"
 +  _CMAKE_ARGS="${_CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=${PREFIX} -DCMAKE_INSTALL_LIBDIR=lib"
 +
-+  CFLAGS_USED="@CFLAGS@ --target=@CHOST@ --sysroot ${CONDA_BUILD_SYSROOT_USED} -isystem ${BUILD_PREFIX}/include -isystem ${PREFIX}/include -fdebug-prefix-map=${SRC_DIR}=/usr/local/src/conda/${PKG_NAME}-${PKG_VERSION} -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda-prefix"
-+  DEBUG_CFLAGS_USED="@CFLAGS@ @DEBUG_CFLAGS@  --target=@CHOST@ --sysroot ${CONDA_BUILD_SYSROOT_USED} -isystem ${BUILD_PREFIX}/include -isystem ${PREFIX}/include -fdebug-prefix-map=${SRC_DIR}=/usr/local/src/conda/${PKG_NAME}-${PKG_VERSION} -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda-prefix"
++  CFLAGS_USED="@CFLAGS@ --target=@CHOST@ --gcc-toolchain=${CONDA_PREFIX} --sysroot ${CONDA_BUILD_SYSROOT_USED} -isystem ${BUILD_PREFIX}/include -isystem ${PREFIX}/include -fdebug-prefix-map=${SRC_DIR}=/usr/local/src/conda/${PKG_NAME}-${PKG_VERSION} -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda-prefix"
++  DEBUG_CFLAGS_USED="@CFLAGS@ @DEBUG_CFLAGS@  --target=@CHOST@ --gcc-toolchain=${CONDA_PREFIX} --sysroot ${CONDA_BUILD_SYSROOT_USED} -isystem ${BUILD_PREFIX}/include -isystem ${PREFIX}/include -fdebug-prefix-map=${SRC_DIR}=/usr/local/src/conda/${PKG_NAME}-${PKG_VERSION} -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda-prefix"
 +  CPPFLAGS_USED="@CPPFLAGS@ -isystem ${PREFIX}/include"
 +  DEBUG_CPPFLAGS_USED="@DEBUG_CPPFLAGS@ -isystem ${PREFIX}/include"
-+  CXXFLAGS_USED="@CXXFLAGS@ --target=@CHOST@ --sysroot ${CONDA_BUILD_SYSROOT_USED} -isystem ${BUILD_PREFIX}/include -isystem ${PREFIX}/include -fdebug-prefix-map=${SRC_DIR}=/usr/local/src/conda/${PKG_NAME}-${PKG_VERSION} -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda-prefix"
-+  DEBUG_CXXFLAGS_USED="@CXXFLAGS@ @DEBUG_CXXFLAGS@ --target=@CHOST@ --sysroot ${CONDA_BUILD_SYSROOT_USED} -isystem ${BUILD_PREFIX}/include -isystem ${PREFIX}/include -fdebug-prefix-map=${SRC_DIR}=/usr/local/src/conda/${PKG_NAME}-${PKG_VERSION} -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda-prefix"
++  CXXFLAGS_USED="@CXXFLAGS@ --target=@CHOST@ --gcc-toolchain=${CONDA_PREFIX} --sysroot ${CONDA_BUILD_SYSROOT_USED} -isystem ${BUILD_PREFIX}/include -isystem ${PREFIX}/include -fdebug-prefix-map=${SRC_DIR}=/usr/local/src/conda/${PKG_NAME}-${PKG_VERSION} -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda-prefix"
++  DEBUG_CXXFLAGS_USED="@CXXFLAGS@ @DEBUG_CXXFLAGS@ --target=@CHOST@ --gcc-toolchain=${CONDA_PREFIX} --sysroot ${CONDA_BUILD_SYSROOT_USED} -isystem ${BUILD_PREFIX}/include -isystem ${PREFIX}/include -fdebug-prefix-map=${SRC_DIR}=/usr/local/src/conda/${PKG_NAME}-${PKG_VERSION} -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda-prefix"
 +  LDFLAGS_USED="@LDFLAGS@ --target=@CHOST@ -Wl,-rpath,${PREFIX}/lib -Wl,-rpath-link,${PREFIX}/lib -L${PREFIX}/lib -Wl,-rpath,${BUILD_PREFIX}/lib -Wl,-rpath-link,${BUILD_PREFIX}/lib -L${BUILD_PREFIX}/lib"
 +  LDFLAGS_LD_USED="@LDFLAGS_LD@ --target=@CHOST@ -rpath ${PREFIX}/lib -rpath-link ${PREFIX}/lib -L${PREFIX}/lib -rpath ${BUILD_PREFIX}/lib -rpath-link ${BUILD_PREFIX}/lib -L${BUILD_PREFIX}/lib"
 +  CMAKE_PREFIX_PATH_USED="${PREFIX}:${CONDA_PREFIX}/@CHOST@/sysroot/usr"
@@ -86,12 +86,12 @@ index 6975b03..a4ff33f 100755
 +
  if [ "${CONDA_BUILD:-0}" = "1" ]; then
 +
-+  CFLAGS_USED="@CFLAGS@ --target=@CHOST@ --sysroot ${CONDA_BUILD_SYSROOT_USED} -isystem ${BUILD_PREFIX}/include -isystem ${PREFIX}/include -fdebug-prefix-map=${SRC_DIR}=/usr/local/src/conda/${PKG_NAME}-${PKG_VERSION} -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda-prefix"
++  CFLAGS_USED="@CFLAGS@ --target=@CHOST@ --gcc-toolchain=${CONDA_PREFIX} --sysroot ${CONDA_BUILD_SYSROOT_USED} -isystem ${BUILD_PREFIX}/include -isystem ${PREFIX}/include -fdebug-prefix-map=${SRC_DIR}=/usr/local/src/conda/${PKG_NAME}-${PKG_VERSION} -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda-prefix"
 +  DEBUG_CFLAGS_USED="@CFLAGS@ @DEBUG_CFLAGS@  --target=@CHOST@ --sysroot ${CONDA_BUILD_SYSROOT_USED} -isystem ${BUILD_PREFIX}/include -isystem ${PREFIX}/include -fdebug-prefix-map=${SRC_DIR}=/usr/local/src/conda/${PKG_NAME}-${PKG_VERSION} -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda-prefix"
 +  CPPFLAGS_USED="@CPPFLAGS@ -isystem ${PREFIX}/include"
 +  DEBUG_CPPFLAGS_USED="@DEBUG_CPPFLAGS@ -isystem ${PREFIX}/include"
-+  CXXFLAGS_USED="@CXXFLAGS@ --target=@CHOST@ --sysroot ${CONDA_BUILD_SYSROOT_USED} -isystem ${BUILD_PREFIX}/include -isystem ${PREFIX}/include -fdebug-prefix-map=${SRC_DIR}=/usr/local/src/conda/${PKG_NAME}-${PKG_VERSION} -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda-prefix"
-+  DEBUG_CXXFLAGS_USED="@CXXFLAGS@ @DEBUG_CXXFLAGS@ --target=@CHOST@ --sysroot ${CONDA_BUILD_SYSROOT_USED} -isystem ${BUILD_PREFIX}/include -isystem ${PREFIX}/include -fdebug-prefix-map=${SRC_DIR}=/usr/local/src/conda/${PKG_NAME}-${PKG_VERSION} -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda-prefix"
++  CXXFLAGS_USED="@CXXFLAGS@ --target=@CHOST@ --gcc-toolchain=${CONDA_PREFIX} --sysroot ${CONDA_BUILD_SYSROOT_USED} -isystem ${BUILD_PREFIX}/include -isystem ${PREFIX}/include -fdebug-prefix-map=${SRC_DIR}=/usr/local/src/conda/${PKG_NAME}-${PKG_VERSION} -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda-prefix"
++  DEBUG_CXXFLAGS_USED="@CXXFLAGS@ @DEBUG_CXXFLAGS@ --target=@CHOST@ --gcc-toolchain=${CONDA_PREFIX} --sysroot ${CONDA_BUILD_SYSROOT_USED} -isystem ${BUILD_PREFIX}/include -isystem ${PREFIX}/include -fdebug-prefix-map=${SRC_DIR}=/usr/local/src/conda/${PKG_NAME}-${PKG_VERSION} -fdebug-prefix-map=${PREFIX}=/usr/local/src/conda-prefix"
 +  LDFLAGS_USED="@LDFLAGS@ --target=@CHOST@ -Wl,-rpath,${PREFIX}/lib -Wl,-rpath-link,${PREFIX}/lib -L${PREFIX}/lib -Wl,-rpath,${BUILD_PREFIX}/lib -Wl,-rpath-link,${BUILD_PREFIX}/lib -L${BUILD_PREFIX}/lib"
 +  LDFLAGS_LD_USED="@LDFLAGS_LD@ --target=@CHOST@ -rpath ${PREFIX}/lib -rpath-link ${PREFIX}/lib -L${PREFIX}/lib -rpath ${BUILD_PREFIX}/lib -rpath-link ${BUILD_PREFIX}/lib -L${BUILD_PREFIX}/lib"
 +  CMAKE_PREFIX_PATH_USED="${PREFIX}:${CONDA_PREFIX}/@CHOST@/sysroot/usr"
