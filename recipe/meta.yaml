@@ -221,8 +221,8 @@ outputs:
         # 2. Pin to year for now, similar to MKL.
         strong:
           - {{ pin_subpackage("dpcpp-cpp-rt", max_pin="x") }}          
-          - libgcc-ng >={{ c_compiler_version }}
-          - libstdcxx-ng >={{ cxx_compiler_version }}
+          - libgcc-ng >={{ c_compiler_version }}      # [linux]
+          - libstdcxx-ng >={{ cxx_compiler_version }} # [linux]
     requirements:
       run:
         - {{ pin_subpackage('dpcpp-cpp-rt', exact=True) }}        
@@ -266,8 +266,8 @@ outputs:
         # 2. Pin to year for now, similar to MKL.
         strong:
           - {{ pin_subpackage("dpcpp-cpp-rt", max_pin="x") }}          
-          - libgcc-ng >={{ c_compiler_version }}
-          - libstdcxx-ng >={{ cxx_compiler_version }}
+          - libgcc-ng >={{ c_compiler_version }}      # [linux]
+          - libstdcxx-ng >={{ cxx_compiler_version }} # [linux]
     requirements:   # [linux or win64]
       # for us to be able to use clang/icx -dumpmachine
       build:        # [linux or win64]
