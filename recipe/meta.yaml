@@ -43,7 +43,7 @@ source:
   - url: https://anaconda.org/intel/dpcpp_{{ target_platform }}/{{ version }}/download/{{ target_platform }}/dpcpp_{{ target_platform }}-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
     folder: dpcpp_{{ target_platform }}
     patches:
-      - patches/0001-dpcpp-activation.patch
+      - patches/0001-dpcpp-activation.patch # [linux]
   - url: https://anaconda.org/intel/mkl-dpcpp/{{ version }}/download/{{ target_platform }}/mkl-dpcpp-{{ version }}-intel_{{ mkl_dpcpp_build_number }}.tar.bz2
     folder: mkl-dpcpp
   - url: https://anaconda.org/intel/mkl-devel-dpcpp/{{ version }}/download/{{ target_platform }}/mkl-devel-dpcpp-{{ version }}-intel_{{ mkl_dpcpp_build_number }}.tar.bz2
