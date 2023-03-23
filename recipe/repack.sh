@@ -6,7 +6,7 @@ set -eux
 
 src="${SRC_DIR}/${PKG_NAME}"
 
-cp -rv "${src}"/* "${PREFIX}/"
+cp -av "${src}"/* "${PREFIX}/"
 
 # special case to set up compilers with host prepended.
 if [[ ${PKG_NAME} =~ dpcpp_impl_.* ]]; then
