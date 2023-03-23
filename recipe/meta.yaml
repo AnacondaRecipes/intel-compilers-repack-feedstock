@@ -160,7 +160,7 @@ outputs:
         # OSX we use a slightly older version. This works perfectly fine but
         # we should get rid of it whenever we have a newer version.
         - intel-openmp {{ version.split('.')[0] }}.*              # [not osx]
-        - intel-openmp 2022.*,2023.*                              # [osx]
+        - intel-openmp                                            # [osx]
         - {{ pin_subpackage('intel-cmplr-lic-rt', exact=True) }}
         - {{ pin_subpackage('intel-cmplr-lib-rt', exact=True) }}  # [not osx]
     about:
@@ -195,7 +195,7 @@ outputs:
         # OSX we use a slightly older version. This works perfectly fine but
         # we should get rid of it whenever we have a newer version.
         - intel-openmp {{ version.split('.')[0] }}.*              # [not osx]
-        - intel-openmp 2022.*,2023.*                              # [osx]
+        - intel-openmp                                            # [osx]
         - {{ pin_subpackage('intel-cmplr-lic-rt', exact=True) }}
         - {{ pin_subpackage('intel-cmplr-lib-rt', exact=True) }}  # [not osx]
         - {{ pin_subpackage('intel-opencl-rt', exact=True) }}     # [not osx]
