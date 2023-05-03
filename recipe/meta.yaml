@@ -4,8 +4,8 @@
 {% set intel_build_number = "43547" %}   # [osx]
 {% set intel_build_number = "46319" %}   # [win]
 
-{% set oneccl_version = "2021.8.0" %}
-{% set oneccl_build_number = "25371" %}
+{% set oneccl_version = "2021.9.0" %}
+{% set oneccl_build_number = "43543" %}
 
 {% set tbb_version = "2021.6.0" %}
 
