@@ -155,12 +155,7 @@ outputs:
         - "/opt/intel/compilers_and_libraries/linux/mpi/intel64/lib"
     requirements:
       run:
-        # Due to issues with Intel's repack of their oneAPI binaries for OSX,
-        # we could not update intel-openmp to the 2023 version. Therefore, for
-        # OSX we use a slightly older version. This works perfectly fine but
-        # we should get rid of it whenever we have a newer version.
-        - intel-openmp {{ version.split('.')[0] }}.*              # [not osx]
-        - intel-openmp                                            # [osx]
+        - intel-openmp {{ version.split('.')[0] }}.*
         - {{ pin_subpackage('intel-cmplr-lic-rt', exact=True) }}
         - {{ pin_subpackage('intel-cmplr-lib-rt', exact=True) }}  # [not osx]
     about:
@@ -190,12 +185,7 @@ outputs:
         - '*'
     requirements:
       run:
-        # Due to issues with Intel's repack of their oneAPI binaries for OSX,
-        # we could not update intel-openmp to the 2023 version. Therefore, for
-        # OSX we use a slightly older version. This works perfectly fine but
-        # we should get rid of it whenever we have a newer version.
-        - intel-openmp {{ version.split('.')[0] }}.*              # [not osx]
-        - intel-openmp                                            # [osx]
+        - intel-openmp {{ version.split('.')[0] }}.*
         - {{ pin_subpackage('intel-cmplr-lic-rt', exact=True) }}
         - {{ pin_subpackage('intel-cmplr-lib-rt', exact=True) }}  # [not osx]
         - {{ pin_subpackage('intel-opencl-rt', exact=True) }}     # [not osx]
