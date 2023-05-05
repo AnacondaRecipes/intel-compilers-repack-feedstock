@@ -3,6 +3,3 @@ build_parameters:
   - "--suppress-variables"
   - "--error-overlinking"
   - "--error-overdepending"
-
-channels:
-  jcmorin-ana-org: dpcpp-2023.1.0
