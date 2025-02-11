@@ -1,19 +1,20 @@
-{% set version = "2023.1.0" %}           # [linux]
-{% set version = "2023.1.0" %}           # [osx or win]
-{% set intel_build_number = "46305" %}   # [linux]
-{% set intel_build_number = "43547" %}   # [osx]
-{% set intel_build_number = "46319" %}   # [win]
+{% set version = "2025.0.4" %}
+# work-around for https://github.com/conda/conda-build/issues/5443
+{% set intel_build_number = "dummy" %}
+{% set intel_build_number = "1519" %}   # [linux]
+{% set intel_build_number = "1521" %}   # [win]
 
-{% set oneccl_version = "2021.9.0" %}
-{% set oneccl_build_number = "43543" %}
+{% set tbb_version_major = "2022" %}
 
-{% set tbb_version = "2021.6.0" %}
+{% set umf_version = "0.9.1" %}
+{% set umf_build_number = "6" %}   # [linux]
+{% set umf_build_number = "5" %}   # [win]
 
-{% set mkl_dpcpp_build_number = "46342" %}  # [linux]
-{% set mkl_dpcpp_build_number = "46356" %}  # [win]
+{% set intel_ch = "https://software.repos.intel.com/python/conda" %}
 
 # use this if our build script changes and we need to increment beyond intel's version
 {% set dst_build_number = '0' %}
+{% set build_number = intel_build_number|int + dst_build_number|int %}
 
 package:
   name: intel-compiler-repack
@@ -21,65 +22,55 @@ package:
 
 source:
   # Is there a better way to specify skipping the source if it does not exist? (so it matches 'skip: True' selectors)
-  - url: https://anaconda.org/intel/intel-cmplr-lic-rt/{{ version }}/download/{{ target_platform }}/intel-cmplr-lic-rt-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
+  - url: {{ intel_ch }}/{{ target_platform }}/intel-cmplr-lic-rt-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
     folder: intel-cmplr-lic-rt
-  - url: https://anaconda.org/intel/intel-fortran-rt/{{ version }}/download/{{ target_platform }}/intel-fortran-rt-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
-    folder: intel-fortran-rt
-  - url: https://anaconda.org/intel/dpcpp-cpp-rt/{{ version }}/download/{{ target_platform }}/dpcpp-cpp-rt-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
-    folder: dpcpp-cpp-rt
-  {% if not osx %}
-  - url: https://anaconda.org/intel/intel-cmplr-lib-rt/{{ version }}/download/{{ target_platform }}/intel-cmplr-lib-rt-{{ version }}-intel_{{ intel_build_number }}.tar.bz2 
+    sha256: 61fc4e231dafea5d3c1bf6da8c4651f22f94c82605969a73a9dc08069683529f  # [linux64]
+  - url: {{ intel_ch }}/{{ target_platform }}/intel-cmplr-lib-rt-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
     folder: intel-cmplr-lib-rt
-  {% endif %}
-  {% if not (osx) %}
-  - url: https://anaconda.org/intel/intel-opencl-rt/{{ version }}/download/{{ target_platform }}/intel-opencl-rt-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
-    folder: intel-opencl-rt
-  {% endif %}
-  {% if linux or win %}
-  - url: https://anaconda.org/intel/dpcpp_impl_{{ target_platform }}/{{ version }}/download/{{ target_platform }}/dpcpp_impl_{{ target_platform }}-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
-    folder: dpcpp_impl_{{ target_platform }}
-  - url: https://anaconda.org/intel/dpcpp_{{ target_platform }}/{{ version }}/download/{{ target_platform }}/dpcpp_{{ target_platform }}-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
-    folder: dpcpp_{{ target_platform }}
-    patches:                                # [linux]
-      - patches/0001-dpcpp-activation.patch # [linux]
-  - url: https://anaconda.org/intel/mkl-dpcpp/{{ version }}/download/{{ target_platform }}/mkl-dpcpp-{{ version }}-intel_{{ mkl_dpcpp_build_number }}.tar.bz2
-    folder: mkl-dpcpp
-  - url: https://anaconda.org/intel/mkl-devel-dpcpp/{{ version }}/download/{{ target_platform }}/mkl-devel-dpcpp-{{ version }}-intel_{{ mkl_dpcpp_build_number }}.tar.bz2
-    folder: mkl-devel-dpcpp
-  {% endif %}
-  {% if linux %}
-  - url: https://anaconda.org/intel/oneccl-devel/{{ oneccl_version }}/download/{{ target_platform }}/oneccl-devel-{{ oneccl_version }}-intel_{{ oneccl_build_number }}.tar.bz2
-    folder: oneccl-devel
-  {% endif %}
+    sha256: 22c74d6f81205dddba45791047e6fa77659407b4ef28c336198c62d86a23bdb3  # [linux64]
+  - url: {{ intel_ch }}/{{ target_platform }}/intel-cmplr-lib-ur-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
+    folder: intel-cmplr-lib-ur
+    sha256: 243a40ffcfa1b7814d56b0e9c60ebe2d5e9906086373bca978c9924de0fd8066  # [linux64]
+  - url: {{ intel_ch }}/{{ target_platform }}/intel-sycl-rt-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
+    folder: intel-sycl-rt
+    sha256: 185e217c40e89cad85404b0a340ed2ba3c6d5d040c2ae3eb7758e37ff034acdc  # [linux64]
+  - url: {{ intel_ch }}/{{ target_platform }}/intel-fortran-rt-{{ version }}-intel_{{ intel_build_number }}.tar.bz2
+    folder: intel-fortran-rt
+    sha256: 15c08e8909b9bd7488ca20a8b221ea486cde66e86e66a1d6a3276c89e320f649  # [linux64]
+  - url: {{ intel_ch }}/{{ target_platform }}/intel-opencl-rt-{{ version }}-intel_{{ intel_build_number }}.tar.bz2  # [linux64 or win64]
+    folder: intel-opencl-rt  # [linux64 or win64]
+    sha256: f29ca2457ff5e1328fec63db1d242ecbbe0cc82be8a829b7197ca26159889b58  # [linux64]
+  - url: {{ intel_ch }}/{{ target_platform }}/umf-{{ umf_version }}-intel_{{ umf_build_number }}.tar.bz2  # [linux64 or win64]
+    folder: umf  # [linux64 or win64]
+    sha256: f0fcd30adf44e9b85b57412b196938b07aa4caebedaf7e62c4e9b6ebb133f83d  # [linux64]
+  - url: {{ intel_ch }}/{{ target_platform }}/compiler_shared-{{ version }}-intel_{{ intel_build_number }}.tar.bz2  # [linux64 or win64]
+    folder: compiler_shared  # [linux64 or win64]
+    sha256: 2fa7239075531274f783da8b903c8293128fc0427124c63466ab39301d775856  # [linux64]
 
 build:
-  number: {{ intel_build_number|int + dst_build_number|int }}
-  binary_relocation: false
-  detect_binary_files_with_prefix: false
-  skip: True                                  # [not x86]
-  missing_dso_whitelist:
-    # these are binary repackages after all.
-    # Note: any output that specifies a 'build' section will need to include this
-    # because it gets overwritten? what about binary_relocation / detect_binary_files_with_prefix?
-    - '*'
-
-requirements:
-  build:
-    - patch     # [unix]
-    - m2-patch  # [win]
+  number: {{ build_number }}
+  binary_relocation: False
+  detect_binary_files_with_prefix: False
+  skip: True                                  # [not (linux64 or win)]
 
 outputs:
   - name: intel-cmplr-lic-rt
     script: repack.sh   # [unix]
     script: repack.bat  # [win]
+    build:
+      missing_dso_whitelist:
+        - '*'
+      run_exports:
+        # This is just a license file package, so let's pin it strict.
+        - {{ pin_subpackage("intel-cmplr-lic-rt", exact=True) }}
     about:
       home: https://software.intel.com/content/www/us/en/develop/tools.html
       doc_url: https://software.intel.com/content/www/us/en/develop/articles/end-user-license-agreement.html
       dev_url: https://software.intel.com/content/www/us/en/develop/articles/end-user-license-agreement.html
       summary: Intel End User License Agreement for Developer Tools
-      license: Intel End User License Agreement for Developer Tools
+      license: LicenseRef-Proprietary-Intel-End-User-License-Agreement-for-Developer-Tools
       license_family: Proprietary
-      license_file: 
+      license_file:
         - intel-cmplr-lic-rt/info/licenses/license.txt
         - intel-cmplr-lic-rt/info/licenses/tpp.txt
       description: |
@@ -94,17 +85,34 @@ outputs:
     script: repack.sh   # [unix]
     script: repack.bat  # [win]
     build:
-      skip: True  # [osx]
       missing_dso_whitelist:
         - '*'
+      run_exports:
+        # Pin to year for now, similar to MKL.
+        - {{ pin_subpackage("intel-cmplr-lib-rt", max_pin="x") }}
+    requirements:
+      # Since it is repack, we do not need these packages in the build and host
+      # sections. However it is limitation of conda-build to check for library
+      # linking only for the packages that are presented in build and host and
+      # have run_export section.
+      build:
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
+      host:
+        - zlib
+        # intel-cmplr-lic-rt is a license file, please do not remove.
+        - {{ pin_subpackage('intel-cmplr-lic-rt', exact=True) }}
+      run:
+        # intel-cmplr-lic-rt is a license file, please do not remove.
+        - {{ pin_subpackage('intel-cmplr-lic-rt', exact=True) }}
     about:
       home: https://software.intel.com/content/www/us/en/develop/tools.html
       doc_url: https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html
       dev_url: https://software.intel.com/content/www/us/en/develop/documentation/cpp-compiler-developer-guide-and-reference/top.html
       summary: Runtime for Intel® C++ Compiler Classic
-      license: Intel End User License Agreement for Developer Tools
+      license: LicenseRef-Proprietary-Intel-End-User-License-Agreement-for-Developer-Tools
       license_family: Proprietary
-      license_file: 
+      license_file:
         - intel-cmplr-lib-rt/info/licenses/license.txt
         - intel-cmplr-lib-rt/info/licenses/tpp.txt
       description: |
@@ -113,37 +121,102 @@ outputs:
     test:
       commands:
         - ls -A1 ${PREFIX}/lib/*  # [unix]
-        - dir %PREFIX%\Library\bin\* # [win]
+        - dir %PREFIX%\Library\bin\*  # [win]
 
-  - name: intel-opencl-rt
+  - name: intel-cmplr-lib-ur
     script: repack.sh   # [unix]
     script: repack.bat  # [win]
     build:
-      skip: True  # [osx]
       missing_dso_whitelist:
         - '*'
+      ignore_run_exports_from:
+        - level-zero-devel  # [linux]
+      run_exports:
+        # Pin to year for now, similar to MKL.
+        - {{ pin_subpackage("intel-cmplr-lib-ur", max_pin="x") }}
     requirements:
+      # Since it is repack, we do not need these packages in the build and host
+      # sections. However it is limitation of conda-build to check for library
+      # linking only for the packages that are presented in build and host and
+      # have run_export section.
+      build:
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
+      host:
+        - zlib
+        - ocl-icd  # [linux]
+        - khronos-opencl-icd-loader  # [win]
+        # Pinning it on linux for now, because on windows it should be
+        # distributed with driver and because of the specific of the system
+        # level zero loader may be searched only in the system directories.
+        # TODO: check if windows libraries may be loaded from conda environment.
+        - level-zero-devel  # [linux]
+        - {{ pin_subpackage('intel-cmplr-lib-rt', exact=True) }}
+        - {{ pin_subpackage('umf', exact=True) }}
       run:
-        - intel-openmp {{ version.split('.')[0] }}.*
-        - tbb {{ tbb_version.split('.')[0] }}.*
-        - {{ pin_subpackage('intel-cmplr-lic-rt', exact=True) }}
+        - {{ pin_subpackage('intel-cmplr-lib-rt', exact=True) }}
+        - {{ pin_subpackage('umf', exact=True) }}
+      run_constrained:
+        # Pinning it on linux for now, because on windows it should be
+        # distributed with driver and because of the specific of the system
+        # level zero loader may be searched only in the system directories.
+        # TODO: check if windows libraries may be loaded from conda environment.
+        - {{ pin_compatible("level-zero") }}     # [linux]
     about:
       home: https://software.intel.com/content/www/us/en/develop/tools.html
-      doc_url: https://software.intel.com/content/www/us/en/develop/tools/opencl-cpu-runtime.html
-      dev_url: https://software.intel.com/content/www/us/en/develop/documentation/iocl-tec-opg/top.html
-      summary: Intel® CPU Runtime for OpenCL™
-      license: Intel End User License Agreement for Developer Tools
+      doc_url: https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html
+      dev_url: https://software.intel.com/content/www/us/en/develop/documentation/cpp-compiler-developer-guide-and-reference/top.html
+      summary: Runtime for Intel® C++ Compiler Classic
+      license: LicenseRef-Proprietary-Intel-End-User-License-Agreement-for-Developer-Tools
       license_family: Proprietary
-      license_file: 
-        - intel-opencl-rt/info/licenses/license.txt
-        - intel-opencl-rt/info/licenses/tpp.txt
+      license_file:
+        - intel-cmplr-lib-ur/info/licenses/license.txt
+        - intel-cmplr-lib-ur/info/licenses/tpp.txt
       description: |
-        Runtime for OpenCL™ applications on Intel® Processors.
+        Runtime for Intel® C++ Compiler Classic.
         This package is a repackaged set of binaries obtained directly from Intel's Anaconda.org channel.
     test:
       commands:
         - ls -A1 ${PREFIX}/lib/*  # [unix]
-        - dir %PREFIX%\Library\bin\* # [win]
+        - dir %PREFIX%\Library\bin\*  # [win]
+        - test -f ${PREFIX}/lib/libur_loader.so  # [linux]
+
+  - name: intel-sycl-rt
+    script: repack.sh   # [unix]
+    script: repack.bat  # [win]
+    build:
+      missing_dso_whitelist:
+        - '*'
+      run_exports:
+        # Pin to year for now, similar to MKL.
+        - {{ pin_subpackage("intel-sycl-rt", max_pin="x") }}
+    requirements:
+      build:
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
+      host:
+        - {{ pin_subpackage('intel-cmplr-lib-rt', exact=True) }}
+        - {{ pin_subpackage('intel-cmplr-lib-ur', exact=True) }}
+      run:
+        - {{ pin_subpackage('intel-cmplr-lib-rt', exact=True) }}
+        - {{ pin_subpackage('intel-cmplr-lib-ur', exact=True) }}
+    about:
+      home: https://software.intel.com/content/www/us/en/develop/tools.html
+      doc_url: https://software.intel.com/content/www/us/en/develop/articles/end-user-license-agreement.html
+      dev_url: https://software.intel.com/content/www/us/en/develop/articles/end-user-license-agreement.html
+      summary: Intel End User License Agreement for Developer Tools
+      license: LicenseRef-Proprietary-Intel-End-User-License-Agreement-for-Developer-Tools
+      license_family: Proprietary
+      license_file:
+        - intel-sycl-rt/info/licenses/license.txt
+        - intel-sycl-rt/info/licenses/tpp.txt
+      description: |
+        Intel End User License Agreement for Developer Tools.
+        This package is a repackaged set of binaries obtained directly from Intel's Anaconda.org channel.
+    test:
+      commands:
+        - ls -A1 ${PREFIX}/licensing/compiler/*  # [unix]
+        - dir %PREFIX%\licensing\compiler\*  # [win]
 
   - name: intel-fortran-rt
     script: repack.sh   # [unix]
@@ -151,21 +224,28 @@ outputs:
     build:
       missing_dso_whitelist:
         - '*'
-      runpath_whitelist:
-        - "/opt/intel/compilers_and_libraries/linux/mpi/intel64/lib"
+      run_exports:
+        # Pin to year for now, similar to MKL.
+        - {{ pin_subpackage("intel-fortran-rt", max_pin="x") }}
     requirements:
+      build:
+        - {{ compiler('c') }}
+        - patchelf                 # [linux]
+      host:
+        - mpich                    # [linux]
+        - {{ pin_subpackage('intel-cmplr-lib-rt', exact=True) }}
       run:
-        - intel-openmp {{ version.split('.')[0] }}.*
-        - {{ pin_subpackage('intel-cmplr-lic-rt', exact=True) }}
-        - {{ pin_subpackage('intel-cmplr-lib-rt', exact=True) }}  # [not osx]
+        - _openmp_mutex            # [linux]
+        - llvm-openmp              # [not linux]
+        - {{ pin_subpackage('intel-cmplr-lib-rt', exact=True) }}
     about:
       home: https://software.intel.com/content/www/us/en/develop/tools.html
       doc_url: https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/fortran-compiler.html
       dev_url: https://software.intel.com/content/www/us/en/develop/documentation/fortran-compiler-oneapi-dev-guide-and-reference/top.html
       summary: Runtime for Intel® Fortran Compiler Classic and Intel® Fortran Compiler (Beta)
-      license: Intel End User License Agreement for Developer Tools
+      license: LicenseRef-Proprietary-Intel-End-User-License-Agreement-for-Developer-Tools
       license_family: Proprietary
-      license_file: 
+      license_file:
         - intel-fortran-rt/info/licenses/license.txt
         - intel-fortran-rt/info/licenses/tpp.txt
       description: |
@@ -174,242 +254,120 @@ outputs:
     test:
       commands:
         - ls -A1 ${PREFIX}/lib/*  # [unix]
-        - dir %PREFIX%\Library\bin\* # [win]
-
-  - name: dpcpp-cpp-rt
-    script: repack.sh   # [unix]
-    script: repack.bat  # [win]
-    build:
-      skip: True  # [win32]
-      missing_dso_whitelist:
-        - '*'
-    requirements:
-      run:
-        - intel-openmp {{ version.split('.')[0] }}.*
-        - {{ pin_subpackage('intel-cmplr-lic-rt', exact=True) }}
-        - {{ pin_subpackage('intel-cmplr-lib-rt', exact=True) }}  # [not osx]
-        - {{ pin_subpackage('intel-opencl-rt', exact=True) }}     # [not osx]
-    about:
-      home: https://software.intel.com/content/www/us/en/develop/tools.html
-      doc_url: https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html
-      dev_url: https://software.intel.com/content/www/us/en/develop/documentation/oneapi-dpcpp-cpp-compiler-dev-guide-and-reference/top.html
-      summary: Runtime for Intel® oneAPI DPC++/C++ Compiler
-      license: Intel End User License Agreement for Developer Tools
-      license_family: Proprietary
-      license_file: 
-        - dpcpp-cpp-rt/info/licenses/license.txt
-        - dpcpp-cpp-rt/info/licenses/tpp.txt
-      description: |
-        Runtime for Intel® oneAPI DPC++/C++ Compiler.
-        This package is a repackaged set of binaries obtained directly from Intel's Anaconda.org channel.
-    test:
-      commands:
-        - ls -A1 $PREFIX/lib/*  # [unix]
-        - dir %PREFIX%\Library\bin\* # [win]
-
-  - name: dpcpp_impl_{{ target_platform }}
-    script: repack.sh   # [unix]
-    script: repack.bat  # [win]
-    build:
-      skip: True  # [not (linux or win)]
-      missing_dso_whitelist:
-        - '*'
-      run_exports:
-        # 1. strong so if gets added if this package is in the build requirement section.
-        # 2. Pin to year for now, similar to MKL.
-        strong:
-          - {{ pin_subpackage("dpcpp-cpp-rt", max_pin="x") }}          
-          - libgcc-ng >={{ c_compiler_version }}      # [linux]
-          - libstdcxx-ng >={{ cxx_compiler_version }} # [linux]
-    requirements:
-      run:
-        - {{ pin_subpackage('dpcpp-cpp-rt', exact=True) }}
-        # compiler's need a sysroot "/"
-        - sysroot_{{ target_platform }}   # [linux]
-        # targets --rtlib=libgcc because compiler-rt builtins is not provided.
-        - gcc_impl_{{ target_platform }}  # [linux]
-        # these binaries target -stdlib=libstdc++
-        - gxx_impl_{{ target_platform }}  # [linux]
-
-    about:
-      home: https://software.intel.com/content/www/us/en/develop/tools.html
-      doc_url: https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html
-      dev_url: https://software.intel.com/content/www/us/en/develop/documentation/oneapi-dpcpp-cpp-compiler-dev-guide-and-reference/top.html
-      summary: Implementation for Intel® oneAPI DPC++/C++ Compiler
-      license: Intel End User License Agreement for Developer Tools
-      license_family: Proprietary
-      license_file: 
-        - dpcpp_impl_{{ target_platform }}/info/licenses/license.txt  # [linux or win]
-        - dpcpp_impl_{{ target_platform }}/info/licenses/tpp.txt      # [linux or win]
-      description: |
-        Implementation for Intel® oneAPI DPC++/C++ Compiler.
-        This package is a repackaged set of binaries obtained directly from Intel's Anaconda.org channel.
-    test:
-      commands:
-        - ls -A1 ${PREFIX}/bin/*         # [unix]
-        - ls -A1 ${PREFIX}/include/*     # [unix]
-        - ls -A1 ${PREFIX}/lib/*         # [unix]
         - dir %PREFIX%\Library\bin\*  # [win]
-        - dir %PREFIX%\Library\lib\*  # [win]
 
-  - name: dpcpp_{{ target_platform }}
-    script: update-activate-and-repack.sh   # [unix]
-    script: repack.bat                      # [win]
+
+  - name: intel-opencl-rt
+    script: opencl-rt-build.sh   # [unix]
+    script: opencl-rt-bld.bat  # [win]
     build:
-      skip: True  # [not (linux or win)]
       missing_dso_whitelist:
         - '*'
+      binary_relocation: False   # [win]
       run_exports:
-        # 1. strong so if gets added if this package is in the build requirement section.
-        # 2. Pin to year for now, similar to MKL.
-        strong:
-          - {{ pin_subpackage("dpcpp-cpp-rt", max_pin="x") }}
-          - libgcc-ng >={{ c_compiler_version }}      # [linux]
-          - libstdcxx-ng >={{ cxx_compiler_version }} # [linux]
-    requirements:   # [linux or win]
-      # for us to be able to use clang/icx -dumpmachine
-      build:        # [linux or win]
-        - dpcpp_impl_{{ target_platform }}  # [linux or win]
-      run:          # [linux or win]
-        - {{ pin_subpackage('dpcpp_impl_linux-64', exact=True) }} # [linux]
-        - {{ pin_subpackage('dpcpp_impl_win-64', exact=True) }}   # [win]
-    about:
-      home: https://software.intel.com/content/www/us/en/develop/tools.html
-      doc_url: https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/dpc-compiler.html
-      dev_url: https://software.intel.com/content/www/us/en/develop/documentation/oneapi-dpcpp-cpp-compiler-dev-guide-and-reference/top.html
-      summary: Activation for Intel® oneAPI DPC++/C++ Compiler
-      license: Intel End User License Agreement for Developer Tools
-      license_family: Proprietary
-      license_file:                                                   # [linux or win]
-        - dpcpp_impl_{{ target_platform }}/info/licenses/license.txt  # [linux or win]
-        - dpcpp_impl_{{ target_platform }}/info/licenses/tpp.txt      # [linux or win]
-      description: |
-        Activation for Intel® oneAPI DPC++/C++ Compiler.
-        This package is a repackaged set of binaries obtained directly from Intel's Anaconda.org channel.
-    test:
-      requires:
+        # Pin to year for now, similar to MKL.
+        - {{ pin_subpackage("intel-opencl-rt", max_pin="x") }}
+    requirements:
+      build:
         - {{ compiler('c') }}
-        - {{ compiler('cxx') }}
-      files:
-        - simple.cpp
-      commands:
-        - ls -A1 ${PREFIX}/bin/*         # [unix]
-        - ls -A1 ${PREFIX}/include/*     # [unix]
-        - ls -A1 ${PREFIX}/lib/*         # [unix]
-        - dir %PREFIX%\Library\bin\*  # [win]
-        - dir %PREFIX%\Library\lib\*  # [win]
-        - icpx --dpcpp -fsycl --gcc-toolchain=$PREFIX --sysroot=$PREFIX/$HOST/sysroot -target $HOST ${LDFLAGS} ${CXXFLAGS} simple.cpp -lpthread -o simple  # [unix]
-        - icpx -fsycl simple.cpp -I%PREFIX%\include -o simple.exe # [win]
-
-  - name: oneccl-devel
-    version: {{ oneccl_version }}
-    script: repack.sh   # [unix]
-    build:
-      number: {{ oneccl_build_number|int + dst_build_number|int }}
-      skip: True  # [not linux]
-      missing_dso_whitelist:
-        - '*'
+        - patchelf               # [linux]
+        - python *  # [win]
+      host:
+        # We don't dynamically link to tbb, ocl loader and zlib, libxml2 the way
+        # conda can detect, but we need to add them anyway to make it run.
+        - tbb-devel {{ tbb_version_major }}.*
+        # OpenCL loader is not in dependency of this package, but without it
+        # the library is useless. Should user request OpenCL loader explicitly
+        # in downstream recipes?
+        - ocl-icd  # [linux]
+        - khronos-opencl-icd-loader  # [win]
+        # TODO: do we need zlib and libxml2 here?
+        - zlib
+        - libxml2
+        - {{ pin_subpackage('intel-cmplr-lib-rt', exact=True) }}
+      run:
+        - {{ pin_subpackage('intel-cmplr-lib-rt', exact=True) }}
     about:
       home: https://software.intel.com/content/www/us/en/develop/tools.html
-      doc_url: https://software.intel.com/content/www/us/en/develop/tools/oneapi/components/oneccl.htm
-      dev_url: https://software.intel.com/content/www/us/en/develop/documentation/oneccl-developer-guide-and-reference/top.html
-      summary: Intel® oneAPI Collective Communications Library 2021.3.0 for Linux*
-      license: Intel Simplified Software License
+      doc_url: https://software.intel.com/content/www/us/en/develop/tools.html
+      dev_url: https://software.intel.com/content/www/us/en/develop/tools.html
+      summary: Intel® CPU Runtime for OpenCL(TM) Applications
+      license: LicenseRef-Proprietary-Intel-End-User-License-Agreement-for-Developer-Tools
       license_family: Proprietary
-      license_file: 
-        - oneccl-devel/info/licenses/license.txt
-        - oneccl-devel/info/licenses/tpp.txt
+      license_file:
+        - intel-opencl-rt/info/licenses/license.txt
+        - intel-opencl-rt/info/licenses/tpp.txt
       description: |
-        Intel® oneAPI Collective Communications Library 2021.3.0 for Linux*.
+        Intel® CPU Runtime for OpenCL(TM) Applications
         This package is a repackaged set of binaries obtained directly from Intel's Anaconda.org channel.
-    test:
-      commands:
-        - ls -A1 $PREFIX/lib/*  # [unix]
+# Need pyopencl to test intel-opencl-rt.
+#    test:
+#      requires:
+#        - pyopencl
+#        - curl
+#      commands:
+#        - test -f $PREFIX/lib/intel-ocl-cpu/libintelocl.so          # [linux]
+#        - type %PREFIX%\Library\bin\intel-ocl-cpu\cl.cfg            # [win]
+#        - export OCL_ICD_DEBUG=7                                    # [linux]
+#        - curl -O https://raw.githubusercontent.com/inducer/pyopencl/v2021.2.13/examples/demo.py
+#        - export PYOPENCL_CTX=intel  # [unix]
+#        - set PYOPENCL_CTX=intel     # [win]
+#        - python demo.py
 
-  - name: mkl-dpcpp
-    script: repack.sh   # [linux]
+  - name: umf
+    script: repack.sh   # [unix]
     script: repack.bat  # [win]
     build:
-      number: {{ mkl_dpcpp_build_number|int + dst_build_number|int }}   # [linux or win]
-      skip: True  # [not (linux or win)]
       missing_dso_whitelist:
         - '*'
+      number: {{ umf_build_number|int + dst_build_number|int }}
     requirements:
+      build:
+        - {{ compiler('c') }}
+      host:
+        # intel-cmplr-lic-rt is a license file, please do not remove.
+        - {{ pin_subpackage('intel-cmplr-lic-rt', exact=True) }}
       run:
-        - mkl =={{ version }}
-        - dpcpp-cpp-rt {{ version.split('.')[0] }}.*
-        - intel-opencl-rt {{ version.split('.')[0] }}.*
+        # intel-cmplr-lic-rt is a license file, please do not remove.
+        - {{ pin_subpackage('intel-cmplr-lic-rt', exact=True) }}
     about:
-      home: https://www.intel.com/content/www/us/en/develop/tools.html
-      doc_url: https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html
-      dev_url: https://www.intel.com/content/www/us/en/develop/documentation/oneapi-mkl-dpcpp-developer-reference/top.html
-      summary: Intel® oneAPI Math Kernel Library
-      license: Intel Simplified Software License
+      home: https://github.com/oneapi-src/unified-memory-framework
+      doc_url: https://oneapi-src.github.io/unified-memory-framework/
+      dev_url: https://github.com/oneapi-src/unified-memory-framework
+      summary: A library for constructing allocators and memory pools
+      license: LicenseRef-Proprietary-Intel-End-User-License-Agreement-for-Developer-Tools
       license_family: Proprietary
       license_file:
-        - mkl-dpcpp/info/licenses/license.txt
-        - mkl-dpcpp/info/licenses/tpp.txt
+        - umf/info/licenses/license.txt
+        - umf/info/licenses/tpp.txt
       description: |
-        <strong>LEGAL NOTICE: Use of this software package is subject to the
-        software license agreement (as set forth above, in the license section
-        of the installed Conda package and/or the README file) and all notices,
-        disclaimers or license terms for third party or open source software
-        included in or with the software.</strong>
-        <br/><br/>
-        EULA: <a href=\"https://software.intel.com/content/dam/develop/external/us/en/documents/pdf/intel-simplified-software-license.pdf\" target=\"_blank\">Intel Simplified Software License</a>
-        <br/> Third Party Programs: Included in software package <br/><br/>
+        The Unified Memory Framework (UMF) is a library for constructing
+        allocators and memory pools. It also contains broadly useful
+        abstractions and utilities for memory management. UMF allows users to
+        manage multiple memory pools characterized by different attributes,
+        allowing certain allocation types to be isolated from others and
+        allocated using different hardware resources as required.
     test:
       commands:
-        - ls -A1 ${PREFIX}/lib/*        # [linux]
-        - dir %PREFIX%\Library\lib\*    # [win]
-
-  - name: mkl-devel-dpcpp
-    script: repack.sh   # [linux]
-    script: repack.bat  # [win]
-    build:
-      number: {{ mkl_dpcpp_build_number|int + dst_build_number|int }}   # [linux or win]
-      skip: True  # [not (linux or win)]
-      missing_dso_whitelist:
-        - '*'
-      run_exports:
-        - {{ pin_subpackage('mkl-dpcpp') }}
-    requirements:
-      run:
-        - mkl-devel =={{ version }}
-        - {{ pin_subpackage('mkl-dpcpp', exact=True) }}
-    about:
-      home: https://www.intel.com/content/www/us/en/develop/tools.html
-      doc_url: https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html
-      dev_url: https://www.intel.com/content/www/us/en/develop/documentation/oneapi-mkl-dpcpp-developer-reference/top.html
-      summary: Intel® oneAPI Math Kernel Library
-      license: Intel Simplified Software License
-      license_family: Proprietary
-      license_file:
-        - mkl-devel-dpcpp/info/licenses/license.txt
-        - mkl-devel-dpcpp/info/licenses/tpp.txt
-      description: |
-        <strong>LEGAL NOTICE: Use of this software package is subject to the
-        software license agreement (as set forth above, in the license section
-        of the installed Conda package and/or the README file) and all notices,
-        disclaimers or license terms for third party or open source software
-        included in or with the software.</strong>
-        <br/><br/>
-        EULA: <a href=\"https://software.intel.com/content/dam/develop/external/us/en/documents/pdf/intel-simplified-software-license.pdf\" target=\"_blank\">Intel Simplified Software License</a>
-        <br/> Third Party Programs: Included in software package <br/><br/>
-    test:
-      commands:
-        - ls -A1 ${PREFIX}/lib/*            # [linux]
-        - ls -A1 ${PREFIX}/include/*        # [linux]
-        - dir %PREFIX%\Library\include\*    # [win]
-        - dir %PREFIX%\Library\lib\*        # [win]
+        - ls -A1 ${PREFIX}/licensing/compiler/*  # [unix]
+        - ls -A1 ${PREFIX}/lib/libumf.so*  # [unix]
+        - dir %PREFIX%\licensing\compiler\*  # [win]
 
 about:
   home: https://github.com/AnacondaRecipes/intel-compilers-repack-feedstock
-  license: Intel End User License Agreement for Developer Tools
+  license: LicenseRef-Proprietary-Intel-End-User-License-Agreement-for-Developer-Tools
+  license_family: Proprietary
   summary: 'Repackaged Intel® compilers and runtimes.'
+  doc_url: https://github.com/AnacondaRecipes/intel-compilers-repack-feedstock/blob/master/README.md
+  dev_url: https://github.com/AnacondaRecipes/intel-compilers-repack-feedstock
 
 extra:
+  skip-lints:
+    - missing_hash
+    - missing_tests
+    - missing_section
   recipe-maintainers:
     - napetrov
     - tomashek
     - oleksandr-pavlyk
+    - ZzEeKkAa
