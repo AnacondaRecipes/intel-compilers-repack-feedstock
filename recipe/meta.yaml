@@ -283,7 +283,7 @@ outputs:
         - khronos-opencl-icd-loader  # [win]
         # TODO: do we need zlib and libxml2 here?
         - zlib
-        - libxml2 2.14.4
+        - libxml2 {{ libxml2 }}
         - {{ pin_subpackage('intel-cmplr-lib-rt', exact=True) }}
       run:
         - {{ pin_subpackage('intel-cmplr-lib-rt', exact=True) }}
