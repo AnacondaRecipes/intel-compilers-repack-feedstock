@@ -13,7 +13,7 @@
 {% set intel_ch = "https://software.repos.intel.com/python/conda" %}
 
 # use this if our build script changes and we need to increment beyond intel's version
-{% set dst_build_number = '0' %}
+{% set dst_build_number = '1' %}
 {% set build_number = intel_build_number|int + dst_build_number|int %}
 
 package:
@@ -283,7 +283,7 @@ outputs:
         - khronos-opencl-icd-loader  # [win]
         # TODO: do we need zlib and libxml2 here?
         - zlib
-        - libxml2
+        - libxml2 2.14.4
         - {{ pin_subpackage('intel-cmplr-lib-rt', exact=True) }}
       run:
         - {{ pin_subpackage('intel-cmplr-lib-rt', exact=True) }}
