@@ -5,4 +5,4 @@ FINAL_PYTHON_SYSCONFIGDATA_NAME:                    # [linux]
 binutils_version:       # [linux]
   - 2.30                # [linux]
 libxml2:
-  - 2.14.4
+  - 2.15.3
