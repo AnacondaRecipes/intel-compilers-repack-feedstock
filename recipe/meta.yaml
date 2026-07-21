@@ -13,7 +13,7 @@
 {% set intel_ch = "https://software.repos.intel.com/python/conda" %}
 
 # use this if our build script changes and we need to increment beyond intel's version
-{% set dst_build_number = '1' %}
+{% set dst_build_number = '2' %}
 {% set build_number = intel_build_number|int + dst_build_number|int %}
 
 package:
@@ -96,6 +96,7 @@ outputs:
       # linking only for the packages that are presented in build and host and
       # have run_export section.
       build:
+        - {{ stdlib('c') }}
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
       host:
@@ -140,6 +141,7 @@ outputs:
       # linking only for the packages that are presented in build and host and
       # have run_export section.
       build:
+        - {{ stdlib('c') }}
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
       host:
@@ -192,6 +194,7 @@ outputs:
         - {{ pin_subpackage("intel-sycl-rt", max_pin="x") }}
     requirements:
       build:
+        - {{ stdlib('c') }}
         - {{ compiler('c') }}
         - {{ compiler('cxx') }}
       host:
@@ -229,6 +232,7 @@ outputs:
         - {{ pin_subpackage("intel-fortran-rt", max_pin="x") }}
     requirements:
       build:
+        - {{ stdlib('c') }}
         - {{ compiler('c') }}
         - patchelf                 # [linux]
       host:
@@ -269,6 +273,7 @@ outputs:
         - {{ pin_subpackage("intel-opencl-rt", max_pin="x") }}
     requirements:
       build:
+        - {{ stdlib('c') }}
         - {{ compiler('c') }}
         - patchelf               # [linux]
         - python *  # [win]
@@ -323,6 +328,7 @@ outputs:
       number: {{ umf_build_number|int + dst_build_number|int }}
     requirements:
       build:
+        - {{ stdlib('c') }}
         - {{ compiler('c') }}
       host:
         # intel-cmplr-lic-rt is a license file, please do not remove.
